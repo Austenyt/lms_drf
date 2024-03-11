@@ -3,7 +3,7 @@ from django.db import models
 
 class Course(models.Model):
     name = models.CharField(max_length=150, verbose_name='Название')
-    preview = models.ImageField(upload_to='previews/')
+    preview = models.ImageField(upload_to='previews/', verbose_name='превью', blank=True, null=True)
     description = models.CharField(max_length=150, verbose_name='Описание')
 
     def __str__(self):
@@ -17,7 +17,7 @@ class Course(models.Model):
 class Lesson(models.Model):
     name = models.CharField(max_length=150, verbose_name='Название')
     description = models.CharField(max_length=150, verbose_name='Описание')
-    preview = models.ImageField(upload_to='previews/')
+    preview = models.ImageField(upload_to='previews/', verbose_name='превью', blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Курс')
     video_url = models.URLField(verbose_name='ссылка на видео')
 
