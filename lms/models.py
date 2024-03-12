@@ -7,7 +7,7 @@ class Course(models.Model):
     description = models.CharField(max_length=150, verbose_name='Описание')
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.description}'
 
     class Meta:
         verbose_name = 'Курс'
@@ -18,11 +18,11 @@ class Lesson(models.Model):
     name = models.CharField(max_length=150, verbose_name='Название')
     description = models.CharField(max_length=150, verbose_name='Описание')
     preview = models.ImageField(upload_to='previews/', verbose_name='превью', blank=True, null=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Курс')
-    video_url = models.URLField(verbose_name='ссылка на видео')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Курс', null=True, blank=True)
+    video_url = models.URLField(verbose_name='ссылка на видео', null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} {self.description}'
 
     class Meta:
         verbose_name = 'Урок'

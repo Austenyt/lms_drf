@@ -6,12 +6,12 @@ from lms.models import Course, Lesson
 class CourseSerializer(serializers.ModelSerializer):
     num_lessons = serializers.SerializerMethodField()
 
-    def get_num_lessons(self, course):
-        return course.lesson_set.count() if course.lesson_set.exists() else 0
+    def get_num_lessons(self, obj):
+        return Lesson.objects.filter(course=obj).count()
 
     class Meta:
         model = Course
-        fields = ['id', 'name', 'preview', 'description', 'num_lessons']
+        fields = ('id', 'name', 'num_lessons')
 
 
 class LessonSerializer(serializers.ModelSerializer):
