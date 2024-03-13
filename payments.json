@@ -4,11 +4,31 @@
     "pk": 1,
     "fields": {
       "user": 1,
-      "payment_date": "2024-03-12",
+      "payment_date": "2022-01-01",
       "course": 1,
       "lesson": 1,
-      "amount": "100.00",
+      "amount": "50.00",
       "payment_method": "cash"
+    }
+  },
+  {
+    "model": "lms.course",
+    "pk": 1,
+    "fields": {
+      "name": "Python",
+      "preview": null,
+      "description": "Best Python"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 1,
+    "fields": {
+      "name": "Algorithms",
+      "description": "Best algorithms",
+      "preview": null,
+      "course": 1,
+      "video_url": null
     }
   },
   {
@@ -16,11 +36,31 @@
     "pk": 2,
     "fields": {
       "user": 2,
-      "payment_date": "2024-03-12",
-      "course": 1,
-      "lesson": 1,
+      "payment_date": "2022-01-01",
+      "course": 2,
+      "lesson": 2,
       "amount": "50.00",
       "payment_method": "transfer"
+    }
+  },
+  {
+    "model": "lms.course",
+    "pk": 2,
+    "fields": {
+      "name": "Django",
+      "preview": null,
+      "description": "Best Django"
+    }
+  },
+  {
+    "model": "lms.lesson",
+    "pk": 2,
+    "fields": {
+      "name": "First",
+      "description": "Best first",
+      "preview": null,
+      "course": 2,
+      "video_url": null
     }
   }
 ]
