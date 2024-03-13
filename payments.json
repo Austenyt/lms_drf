@@ -1,5 +1,15 @@
 [
   {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "email": "test1@sky.pro",
+      "phone": null,
+      "city": null,
+      "avatar": null
+    }
+  },
+  {
     "model": "users.payment",
     "pk": 1,
     "fields": {
@@ -29,6 +39,16 @@
       "preview": null,
       "course": 1,
       "video_url": null
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "email": "test2@sky.pro",
+      "phone": null,
+      "city": null,
+      "avatar": null
     }
   },
   {
