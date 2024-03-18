@@ -4,6 +4,10 @@ from django.db import models
 from lms.models import Course, Lesson
 
 
+class UserRoles(models.TextChoices):
+    pass
+
+
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, verbose_name='почта')
