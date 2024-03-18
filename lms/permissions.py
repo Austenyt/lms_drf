@@ -1,13 +1,13 @@
-from django.contrib.auth.models import Group
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
 
-class IsModerator(BasePermission):
-    """
-    Permission to check if the user is a moderator.
-    """
-
+class IsModerator(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.role == UserRoles.MODERATOR:
+        return request.user.groups.filter(name='Модераторы').exists()
+
+
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.user.groups.filter(name='Модераторы').exists():
             return True
-        return False
+        return obj.user == request.user
