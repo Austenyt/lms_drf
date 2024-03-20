@@ -1,31 +1,26 @@
 from rest_framework import viewsets, generics
-from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from lms.models import Course, Lesson
-from users.permissions import IsModerator, IsOwnerOrReadOnly
 from lms.serializers import CourseSerializer, LessonSerializer
+from users.permissions import IsOwnerOrReadOnly
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
-    permission_classes = [IsModerator | IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
-    def list(self, request):
-        return Response("List of courses")
-
-    def retrieve(self, request, pk=None):
-        return Response("Retrieve course details")
-
-    def update(self, request, pk=None):
-        return Response("Update course")
-
-    def partial_update(self, request, pk=None):
-        return Response("Partial update course")
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
+    permission_classes = [IsOwnerOrReadOnly]  # Пользователь может редактировать только свои уроки
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class LessonListAPIView(generics.ListAPIView):
@@ -45,19 +40,3 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
-
-
-class LessonViewSet(viewsets.ViewSet):
-    permission_classes = [IsModerator | IsOwnerOrReadOnly]
-
-    def list(self, request):
-        return Response("List of lessons")
-
-    def retrieve(self, request, pk=None):
-        return Response("Retrieve lesson details")
-
-    def update(self, request, pk=None):
-        return Response("Update lesson")
-
-    def partial_update(self, request, pk=None):
-        return Response("Partial update lesson")
