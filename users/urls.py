@@ -7,10 +7,10 @@ from users.views import UserViewSet
 
 app_name = UsersConfig.name
 router = DefaultRouter()
-router.register('users', UserViewSet)
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('', include(router.urls)),
 ]
