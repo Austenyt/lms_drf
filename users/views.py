@@ -1,12 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from users.permissions import IsModerator
 from users.models import Payment, User
-from users.serializers import PaymentSerializer, UserSerializer, UserRegistrationSerializer
+from users.serializers import PaymentSerializer, UserSerializer
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -20,5 +18,12 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = []  # Для создания пользователей доступно всем
+        elif self.action == 'list':
+            permission_classes = [IsAuthenticated]  # Для просмотра списка пользователей требуется аутентификация
+        else:
+            permission_classes = [IsModerator]  # Для других действий требуются права модератора
+        return [permission() for permission in permission_classes]

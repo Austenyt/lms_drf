@@ -2,7 +2,7 @@ from rest_framework import viewsets, generics
 from rest_framework.response import Response
 
 from lms.models import Course, Lesson
-from lms.permissions import IsModerator, IsOwnerOrReadOnly
+from users.permissions import IsModerator, IsOwnerOrReadOnly
 from lms.serializers import CourseSerializer, LessonSerializer
 
 
