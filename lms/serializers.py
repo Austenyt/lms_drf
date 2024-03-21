@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from lms.models import Course, Lesson
 from lms.validators import validate_youtube_url
+from users.serializers import SubscriptionSerializer
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -14,6 +15,7 @@ class LessonSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     num_lessons = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
+    subscription = SubscriptionSerializer(many=True, read_only=True, source='subscription_set')
 
     def get_num_lessons(self, instance):
         return instance.lesson_set.all().count()
