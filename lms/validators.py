@@ -1,14 +1,10 @@
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
-from urllib.parse import urlparse
 
 
-def validate_youtube_url(value):
-    url_validator = URLValidator()
-    try:
-        url_validator(value)
-        parsed_url = urlparse(value)
-        if parsed_url.netloc != 'www.youtube.com':
-            raise ValidationError("Ссылка должна быть на YouTube видео.")
-    except ValidationError:
-        raise ValidationError("Некорректная ссылка.")
+class LessonLinkValidator:
+    def __init__(self, allowed_domain):
+        self.allowed_domain = allowed_domain
+
+    def __call__(self, value):
+        if not value.startswith(f'https://www.{self.allowed_domain}/'):
+            raise ValidationError(f'Only links to {self.allowed_domain} are allowed.')

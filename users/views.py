@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from lms.models import Course
 from users.permissions import IsModerator
-from users.models import Payment, Subscription
+from users.models import Payment, Subscription, User
 from users.serializers import PaymentSerializer
 
 
@@ -21,6 +21,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ViewSet):
+    queryset = User.objects.all()
     authentication_classes = [JWTAuthentication]
 
     def get_permissions(self):
@@ -61,14 +62,15 @@ class SubscriptionView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         course_id = request.data.get('course_id')
-        course = get_object_or_404(Course, id=course_id)
+        course_item = get_object_or_404(Course, id=course_id)
 
-        subscription, created = Subscription.objects.get_or_create(user=user, course=course)
+        subs_item = Subscription.objects.filter(user=user, course=course_item)
 
-        if created:
-            message = 'Подписка добавлена'
+        if subs_item.exists():
+            subs_item.delete()
+            message = 'Subscription removed'
         else:
-            subscription.delete()
-            message = 'Подписка удалена'
+            Subscription.objects.create(user=user, course=course_item)
+            message = 'Subscription added'
 
         return Response({"message": message})

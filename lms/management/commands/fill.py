@@ -18,12 +18,12 @@ class Command(BaseCommand):
         user2, created = User.objects.get_or_create(email='test2@sky.pro')
 
         # Создаем курсы
-        course1, created = Course.objects.get_or_create(title='Название курса 1')
-        course2, created = Course.objects.get_or_create(title='Название курса 2')
+        course1, created = Course.objects.get_or_create(name='Название курса 1')
+        course2, created = Course.objects.get_or_create(name='Название курса 2')
 
         # Создаем уроки и связываем их с курсами
-        lesson1, created = Lesson.objects.get_or_create(title='Название урока 1', course=course1)
-        lesson2, created = Lesson.objects.get_or_create(title='Название урока 2', course=course2)
+        lesson1, created = Lesson.objects.get_or_create(name='Название урока 1', course=course1)
+        lesson2, created = Lesson.objects.get_or_create(name='Название урока 2', course=course2)
 
         # Создаем платежи
         payment1 = Payment.objects.create(
