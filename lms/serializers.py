@@ -1,7 +1,6 @@
-from rest_framework import serializers, filters
+from rest_framework import serializers
 
 from lms.models import Course, Lesson
-from users.models import Payment, User
 
 
 class LessonSerializer(serializers.ModelSerializer):
