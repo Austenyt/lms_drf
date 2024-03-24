@@ -1,17 +1,16 @@
 from rest_framework import serializers
 
-from lms.models import Course, Lesson
-from lms.validators import LessonLinkValidator
-from users.models import Subscription
+from lms.models import Course, Lesson, Subscription
+from lms.validators import UrlValidator
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    video_url = serializers.URLField()
+
     class Meta:
         model = Lesson
         fields = '__all__'
-        validators = [
-            LessonLinkValidator(allowed_domain='youtube.com')
-        ]
+        validators = [UrlValidator(field='video_url')]
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -23,11 +22,16 @@ class CourseSerializer(serializers.ModelSerializer):
         return instance.lesson_set.all().count()
 
     def get_is_subscribed(self, obj):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return Subscription.objects.filter(user=user, course=obj).exists()
-        return False
+        request = self.context.get('request')
+        user = request.user
+        return Subscription.objects.filter(user=user, course=obj).exists()
 
     class Meta:
         model = Course
         fields = ['id', 'name', 'num_lessons', 'description', 'is_subscribed']
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'

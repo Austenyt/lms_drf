@@ -1,14 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from lms.models import Course
 from users.permissions import IsModerator
-from users.models import Payment, Subscription, User
+from users.models import Payment, User
 from users.serializers import PaymentSerializer
 
 
@@ -56,21 +53,3 @@ class UserViewSet(viewsets.ViewSet):
     def course_update(self, request, pk=None):
         # Логика обновления курса
         return Response("Updating course")
-
-
-class SubscriptionView(APIView):
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        course_id = request.data.get('course_id')
-        course_item = get_object_or_404(Course, id=course_id)
-
-        subs_item = Subscription.objects.filter(user=user, course=course_item)
-
-        if subs_item.exists():
-            subs_item.delete()
-            message = 'Subscription removed'
-        else:
-            Subscription.objects.create(user=user, course=course_item)
-            message = 'Subscription added'
-
-        return Response({"message": message})

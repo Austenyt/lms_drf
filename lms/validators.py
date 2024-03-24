@@ -1,10 +1,13 @@
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 
-class LessonLinkValidator:
-    def __init__(self, allowed_domain):
-        self.allowed_domain = allowed_domain
+class UrlValidator:
+    def __init__(self, field):
+        self.field = field
 
     def __call__(self, value):
-        if not value.startswith(f'https://www.{self.allowed_domain}/'):
-            raise ValidationError(f'Only links to {self.allowed_domain} are allowed.')
+        url_validator = URLValidator()
+        url_validator(value)
+        if self.field not in value:
+            raise ValidationError("Only YouTube links are allowed.")

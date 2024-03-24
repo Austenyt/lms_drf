@@ -1,41 +1,63 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
+from django.urls import reverse
+from lms.models import Lesson, Course, Subscription
+from users.models import User
 
-from users.models import Subscription, User
-from .models import Lesson
-from .serializers import LessonSerializer
 
-
-class LessonAPITestCase(APITestCase):
+class LessonCrudTests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(name="testuser", password="testpassword")
         self.client.force_authenticate(user=self.user)
-        self.lesson_data = {'name': 'Test Lesson', 'description': 'This is a test lesson description.'}
-        self.lesson = Lesson.objects.create(owner=self.user, **self.lesson_data)
+        self.course = Course.objects.create(name='test_course', description='test_description')
+        self.lesson = Lesson.objects.create(name='test_lesson', description='test_description', course=self.course)
 
     def test_create_lesson(self):
-        response = self.client.post('/api/lessons/', self.lesson_data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        url = reverse('lesson-create')
+        data = {'name': 'Test Lesson', 'description': 'Test Description', 'course': self.course.id}
+        response = self.client.post(url, data, format='json')
 
-    def test_retrieve_lesson(self):
-        response = self.client.get(f'/api/lessons/{self.lesson.id}/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, LessonSerializer(self.lesson).data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Lesson.objects.count(), 2)  # Проверяем увеличение количества уроков
 
     def test_update_lesson(self):
-        updated_data = {'name': 'Updated Lesson', 'description': 'Updated lesson description.'}
-        response = self.client.put(f'/api/lessons/{self.lesson.id}/', updated_data)
+        url = reverse('lesson-update', kwargs={'pk': self.lesson.id})
+        data = {'name': 'Updated Lesson', 'description': 'Updated Description', 'course': self.course.id}
+        response = self.client.put(url, data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.lesson.refresh_from_db()
-        self.assertEqual(self.lesson.name, updated_data['name'])
+        self.assertEqual(Lesson.objects.get(id=self.lesson.id).name, 'Updated Lesson')
 
     def test_delete_lesson(self):
-        response = self.client.delete(f'/api/lessons/{self.lesson.id}/')
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Lesson.objects.filter(id=self.lesson.id).exists())
+        url = reverse('lesson-delete', kwargs={'pk': self.lesson.id})
+        response = self.client.delete(url)
 
-    def test_subscription_functionality(self):
-        course_id = 1
-        response = self.client.post('/api/subscribe/', {'course_id': course_id})
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Lesson.objects.count(), 0)  # Проверяем удаление урока
+
+
+class SubscriptionTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpassword")
+        self.client.force_authenticate(user=self.user)
+        self.course = Course.objects.create(name='test_course', description='test_description')
+
+    def test_subscription_toggle(self):
+        url = reverse('subscription')
+        data = {'course_id': self.course.id}
+
+        # Добавляем подписку
+        response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(Subscription.objects.filter(user=self.user, course_id=course_id).exists())
+        self.assertTrue(Subscription.objects.filter(user=self.user, course=self.course).exists())
+
+        # Удаляем подписку
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Subscription.objects.filter(user=self.user, course=self.course).exists())
+
+        # Проверяем обработку некорректного course_id
+        data['course_id'] = 999  # Несуществующий ID курса
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Course not found')
