@@ -1,13 +1,15 @@
+import re
+
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
 
 
-class UrlValidator:
+class LessonCustomValidator:
     def __init__(self, field):
         self.field = field
 
     def __call__(self, value):
-        url_validator = URLValidator()
-        url_validator(value)
-        if self.field not in value:
-            raise ValidationError("Only YouTube links are allowed.")
+        youtube_host_regex = re.compile(r'(www\.)?youtube\.com|youtu\.be')
+        field_value = dict(value).get(self.field, '')
+
+        if not youtube_host_regex.search(field_value):
+            raise ValidationError('The link should be from YouTube hosting.')
