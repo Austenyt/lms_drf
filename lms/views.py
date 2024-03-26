@@ -52,7 +52,6 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 class SubscriptionView(APIView):
     serializer_class = SubscriptionSerializer
 
-    @staticmethod
     def post(self, request, *args, **kwargs):
         user = request.user
         course_id = request.data.get('course_id')
