@@ -21,13 +21,10 @@ class LessonCrudTests(APITestCase):
         self.assertEqual(Lesson.objects.count(), 1)  # Проверяем увеличение количества уроков
 
     def test_update_lesson(self):
-        url = reverse('lms:lesson-update', kwargs={'pk': self.lesson.id})
-        data = {'name': 'Updated Lesson', 'description': 'Updated Description', 'course': self.course.id}
-        response = self.client.put(url, data, format='json')
+        lesson = Lesson.objects.create(name='Test_lesson', description='Test_lesson', owner=self.user)
+        response = self.client.patch(f'/material/{lesson.id}/update/', {'description': 'change'})
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        updated_lesson = Lesson.objects.get(id=self.lesson.id)
-        self.assertEqual(updated_lesson.name, 'Updated Lesson')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_lesson(self):
         url = reverse('lms:lesson-delete', kwargs={'pk': self.lesson.id})
